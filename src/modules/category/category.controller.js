@@ -1,35 +1,101 @@
+import { categoryModel } from "../../../dbConnection/models/category.model.js";
+import { productModel } from "../../../dbConnection/models/product.model.js";
 
 
-import { categoryModel } from "../../../dbConnection/models/Category.model.js"
-import { productModel } from "../../../dbConnection/models/product.model.js"
+export const getAllCategories = async (req, res) => {
+    try {
+        const data = await categoryModel.findAll({
+        include: productModel,
+        });
 
+        if (data.length === 0) {
+        return res.status(404).json({
+            message: "no categories found",
+        });
+        }
 
-export const getAllCategories = async (req , res)=>{
-    const data = await categoryModel.findAll({
-        include:productModel
-    })
-    res.json({message:"all categorys : " , data})
-}
+        res.json({
+        message: "all categories",
+        data,
+        });
 
-
-
-export const addCategory = async (req , res)=>{
-    await categoryModel.create(req.body)
-    res.json({message:"new category added successfully"})
-}
-
-
-export const updateCategory = async (req , res)=>{
-    await categoryModel.update(req.body , {where:{id:req.params.id}})
-    res.json({message:"category updated successfully"})
-}
-
-
-export const deleteCategory = async (req , res)=>{
-    let x = await categoryModel.destroy(req.body , {where:{id:req.params.id}})
-    if(x){
-        res.json({message:"category deleted successfully"})
-    }else{
-        res.json({message:"category not found"})
+    } catch (error) {
+        res.status(500).json({
+        message: error.message,
+        });
     }
-}
+};
+
+
+export const addCategory = async (req, res) => {
+    try {
+
+        if (!req.body.name) {
+        return res.status(400).json({
+            message: "name is required",
+        });
+        }
+
+        const newCategory = await categoryModel.create(req.body);
+
+        res.status(201).json({
+        message: "new category added successfully",
+        data: newCategory,
+        });
+
+    } catch (error) {
+        res.status(500).json({
+        message: error.message,
+        });
+    }
+};
+
+
+export const updateCategory = async (req, res) => {
+    try {
+
+        const [updated] = await categoryModel.update(req.body, {
+        where: { id: req.params.id },
+        });
+
+        if (!updated) {
+        return res.status(404).json({
+            message: "category not found",
+        });
+        }
+
+        res.json({
+        message: "category updated successfully",
+        });
+
+    } catch (error) {
+        res.status(500).json({
+        message: error.message,
+        });
+    }
+};
+
+
+export const deleteCategory = async (req, res) => {
+    try {
+
+        const deleted = await categoryModel.destroy({
+        where: { id: req.params.id },
+        });
+
+        if (!deleted) {
+        return res.status(404).json({
+            message: "category not found",
+        });
+        }
+
+        res.json({
+        message: "category deleted successfully",
+        });
+
+    } catch (error) {
+        res.status(500).json({
+        message: error.message,
+        });
+    }
+};

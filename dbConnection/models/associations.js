@@ -1,6 +1,6 @@
 import { vendorModel } from "./vendor.model.js";
 import { productModel } from "./product.model.js";
-import { categoryModel } from "./Category.model.js";
+import { categoryModel } from "./category.model.js";
 
 
 vendorModel.hasMany(productModel, {
